@@ -14,7 +14,7 @@
 #include <Ethernet.h>
 #include <SoftwareSerial.h>
 
-SoftwareSerial HC12(11, 10); // HC-12 TX Pin, HC-12 RX Pin
+SoftwareSerial HC12(2, 3); // HC-12 TX Pin, HC-12 RX Pin
 
 // Enter a MAC address for your controller below.
 // Newer Ethernet shields have a MAC address printed on a sticker on the shield
@@ -27,15 +27,36 @@ char server[] = "www.korlantas.id";    // name address for Google (using DNS)
 const char* php = " /chiller.php";
 const int port   = 80;
 
-String mood = "najib_ganteng";
-String motor = "m_01";
-String idmotor = "100076";
-String lihatkanan = "1";
-String lihatkiri = "1";
-String prox = "1";
-String track = "3";
-String tegangan1 = "11.0";
-String tegangan2 = "11.0";
+//String mood = "najib_ganteng";
+//String motor = "m_01";
+//String idmotor = "100076";
+//String lihatkanan = "1";
+//String lihatkiri = "1";
+//String prox = "1";
+//String track = "3";
+//String tegangan1 = "11.0";
+//String tegangan2 = "11.0";
+//String getValue(String data, char separator, int index)
+//{
+//  int found = 0;
+//  int strIndex[] = {0, -1};
+//  int maxIndex = data.length()-1;
+//
+//  for(int i=0; i<=maxIndex && found<=index; i++){
+//    if(data.charAt(i)==separator || i==maxIndex){
+//        found++;
+//        strIndex[0] = strIndex[1]+1;
+//        strIndex[1] = (i == maxIndex) ? i+1 : i;
+//    }
+//  }
+//
+//  return found>index ? data.substring(strIndex[0], strIndex[1]) : "";
+//}
+
+String nocones;
+String statuss;
+String tegangan;
+String datacones;
 String respon,respon1,respon2,respon3,respon4,respon5,finish,belok,s,sub;
 int panjang,panjang1,panjang2,panjang3,panjang4,panjang5;
 bool m1,m2,m3,m4,mm1,mm2,mm3,mm4,m5,rc,bkanan,bkiri;
@@ -66,6 +87,7 @@ void setup() {
 
   // Open serial communications and wait for port to open:
   Serial.begin(9600);
+  HC12.begin(9600);
   while (!Serial) {
     ; // wait for serial port to connect. Needed for native USB port only
   }
@@ -103,25 +125,32 @@ void setup() {
     // Make a HTTP request:
   String url; 
   url += php;
-//  url += "?mood=";
-//  url += mood;
-   
-  url += "?motor=";
-  url += motor;
-  url += "&idmotor=";
-  url += idmotor;
-  url += "&lihatkanan=";
-  url += lihatkanan;
-  url += "&lihatkiri=";
-  url += lihatkiri;
-  url += "&prox=";
-  url += prox;
-  url += "&track=";
-  url += track;
-  url += "&tegangan1=";
-  url += tegangan1;
-  url += "&tegangan2=";
-  url += tegangan2;
+
+   //motor
+//  url += "?motor=";
+//  url += motor;
+//  url += "&idmotor=";
+//  url += idmotor;
+//  url += "&lihatkanan=";
+//  url += lihatkanan;
+//  url += "&lihatkiri=";
+//  url += lihatkiri;
+//  url += "&prox=";
+//  url += prox;
+//  url += "&track=";
+//  url += track;
+//  url += "&tegangan1=";
+//  url += tegangan1;
+//  url += "&tegangan2=";
+//  url += tegangan2;
+  
+  //cones
+  url += "?nomorcones=";
+  url += nocones;
+  url += "&status=";
+  url += statuss;
+  url += "&tegangan=";
+  url += tegangan;
   
   client.print("GET"); // /chiller.php?mood=najib_ganteng
   client.print(url);
@@ -151,6 +180,32 @@ void loop() {
     byteCount = byteCount + len;
   }
 
+//  if (client.connect(server, 80)) {
+//    Serial.print("connected to ");
+//    Serial.println(client.remoteIP());
+//    // Make a HTTP request:
+//  String url; 
+//  url += php;
+//  //cones
+//  url += "?nomorcones=";
+//  url += nocones;
+//  url += "&status=";
+//  url += statuss;
+//  url += "&tegangan=";
+//  url += tegangan;
+//  
+//  client.print("GET"); // /chiller.php?mood=najib_ganteng
+//  client.print(url);
+//  client.println(" HTTP/1.1");
+//  client.println("Host: korlantas.id");
+//  client.println("Connection: close");
+//  client.println();
+//  Serial.println(url);
+//  } else {
+//    // if you didn't get a connection to the server:
+//    Serial.println("connection failed");
+//  }
+
   // if the server's disconnected, stop the client:
   if (!client.connected()) {
     endMicros = micros();
@@ -167,10 +222,47 @@ void loop() {
     Serial.print(rate);
     Serial.print(" kbytes/second");
     Serial.println();
+  }
 
     // do nothing forevermore:
     while (true) {
-      delay(1);
+        while (HC12.available()) 
+    {
+      char cone = HC12.read();
+      datacones += cone;
+    }
+    Serial.println(datacones);
+    
+//    Serial.println(getValue(datacones,'~',1));
+    //Serial.println(datacones.length());
+    delay(100);
+    if (datacones.length() > 2)
+    {
+      if (client.connect(server, 80)) 
+      {
+       Serial.print("connected to ");
+       Serial.println(client.remoteIP());
+    // Make a HTTP request:
+       String url; 
+       url += php;
+       url += "?nomorcones=";
+       url += datacones;
+//       url += "&status=";
+//       url += statuss;
+//       url += "&tegangan=";
+//       url += tegangan;
+  
+       client.print("GET"); // /chiller.php?mood=najib_ganteng
+       client.print(url);
+       client.println(" HTTP/1.1");
+       client.println("Host: korlantas.id");
+       client.println("Connection: close");
+       client.println();
+       Serial.println(url);
+        }
+    datacones = "";
+    break;
+    }
+    delay(100);
     }
   }
-}
