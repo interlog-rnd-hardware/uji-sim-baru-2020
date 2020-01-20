@@ -207,7 +207,7 @@ void loop() {
     if (datacones.startsWith("<"))
     {
       Serial.println(datanya);
-      if (datanya.startsWith("1") || datanya.startsWith("2") || datanya.startsWith("3") || datanya.startsWith("4") || datanya.startsWith("5") || datanya.startsWith("6") || datanya.startsWith("7") || datanya.startsWith("8") || datanya.startsWith("9") || datanya.startsWith("R"))
+      if (datanya.startsWith("1") || datanya.startsWith("2") || datanya.startsWith("3") || datanya.startsWith("4") || datanya.startsWith("5") || datanya.startsWith("6") || datanya.startsWith("7") || datanya.startsWith("8") || datanya.startsWith("9"))
       {
       if (client.connect(server, 80)) 
       {
@@ -227,8 +227,6 @@ void loop() {
        client.println();
        Serial.println(url);
         }
-    datacones = "";
-    datanya = "";
     }
     else if (datanya.startsWith("R"))
     {
@@ -254,7 +252,27 @@ void loop() {
       }
       Serial.print("Filter repeater = ");
       Serial.println(filterrepeater);
+       if (client.connect(server, 80)) 
+      {
+       Serial.print("connected to ");
+       Serial.println(client.remoteIP());
+    // Make a HTTP request:
+       String url; 
+       url += php;
+       url += "?nomorcones=";
+       url += filterrepeater;
+  
+       client.print("GET"); // /chiller.php?mood=najib_ganteng
+       client.print(url);
+       client.println(" HTTP/1.1");
+       client.println("Host: korlantas.id");
+       client.println("Connection: close");
+       client.println();
+       Serial.println(url);
+        }
     }
+    datacones = "";
+    datanya = "";
     delay(100);
     }
      if (!client.connected()) {
