@@ -15,6 +15,22 @@
 #include <SoftwareSerial.h>
 
 SoftwareSerial HC12(2, 3); // HC-12 TX Pin, HC-12 RX Pin
+String getValue(String data, char separator, int index)
+{
+  int found = 0;
+  int strIndex[] = {0, -1};
+  int maxIndex = data.length()-1;
+
+  for(int i=0; i<=maxIndex && found<=index; i++){
+    if(data.charAt(i)==separator || i==maxIndex){
+        found++;
+        strIndex[0] = strIndex[1]+1;
+        strIndex[1] = (i == maxIndex) ? i+1 : i;
+    }
+  }
+
+  return found>index ? data.substring(strIndex[0], strIndex[1]) : "";
+}
 
 // Enter a MAC address for your controller below.
 // Newer Ethernet shields have a MAC address printed on a sticker on the shield
@@ -52,7 +68,7 @@ const int port   = 80;
 //
 //  return found>index ? data.substring(strIndex[0], strIndex[1]) : "";
 //}
-
+String filterrepeater,nomcones;
 String nocones;
 String statuss;
 String tegangan;
@@ -179,37 +195,6 @@ void loop() {
     }
     byteCount = byteCount + len;
   }
-
-//  if (client.connect(server, 80)) {
-//    Serial.print("connected to ");
-//    Serial.println(client.remoteIP());
-//    // Make a HTTP request:
-//  String url; 
-//  url += php;
-//  //cones
-//  url += "?nomorcones=";
-//  url += nocones;
-//  url += "&status=";
-//  url += statuss;
-//  url += "&tegangan=";
-//  url += tegangan;
-//  
-//  client.print("GET"); // /chiller.php?mood=najib_ganteng
-//  client.print(url);
-//  client.println(" HTTP/1.1");
-//  client.println("Host: korlantas.id");
-//  client.println("Connection: close");
-//  client.println();
-//  Serial.println(url);
-//  } else {
-//    // if you didn't get a connection to the server:
-//    Serial.println("connection failed");
-//  }
-
-  // if the server's disconnected, stop the client:
- 
-
-    // do nothing forevermore:
     while (true) {
         while (HC12.available()) 
     {
@@ -219,16 +204,10 @@ void loop() {
     int indexxx = datacones.indexOf('<');
     int respon = datacones.indexOf('>',indexxx+1);
     String datanya = datacones.substring(indexxx + 1, respon);
-//    if (datacones.startsWith("<"))
-//    {
+    if (datacones.startsWith("<"))
+    {
       Serial.println(datanya);
-//    Serial.println(getValue(datacones,'~',1));
-    //Serial.println(datacones.length());
-    //delay(100);
-//    }
-//    if (datanya.length() > 2)
-//    {
-      if (datanya.startsWith("1") || datanya.startsWith("2") || datanya.startsWith("3") || datanya.startsWith("4") || datanya.startsWith("5") || datanya.startsWith("6") || datanya.startsWith("7") || datanya.startsWith("8") || datanya.startsWith("9") || datanya.startsWith("R"))
+      if (datanya.startsWith("1") || datanya.startsWith("2") || datanya.startsWith("3") || datanya.startsWith("4") || datanya.startsWith("5") || datanya.startsWith("6") || datanya.startsWith("7") || datanya.startsWith("8") || datanya.startsWith("9"))
       {
       if (client.connect(server, 80)) 
       {
@@ -239,10 +218,6 @@ void loop() {
        url += php;
        url += "?nomorcones=";
        url += datanya;
-//       url += "&status=";
-//       url += statuss;
-//       url += "&tegangan=";
-//       url += tegangan;
   
        client.print("GET"); // /chiller.php?mood=najib_ganteng
        client.print(url);
@@ -252,13 +227,54 @@ void loop() {
        client.println();
        Serial.println(url);
         }
+    }
+    }
+    if (datanya.startsWith("R"))
+    {
+      String data1 = getValue(datanya,'~',1);
+      String data2 = getValue(datanya,'~',2);
+      String data3 = getValue(datanya,'~',3);
+      String data4 = getValue(datanya,'~',4);
+      String data5 = getValue(datanya,'~',5);
+      //start
+      if (nomcones == "1" || nomcones == "9" || nomcones == "21" || nomcones == "34" || nomcones == "52")
+      {
+        filterrepeater = data1 + "~" + data2 + "~" + data3 + "~" + data4 + "~" + data5; 
+      }
+      //finish
+      else if(nomcones == "8" || nomcones == "20" || nomcones == "33" || nomcones == "49" || nomcones == "51" || nomcones == "69")
+      {
+        filterrepeater = data1 + "~" + data2 + "~" + data3 + "~" + data4;
+      }
+      //biasa
+      else 
+      {
+        filterrepeater = data1 + "~" + data2 + "~" + data3;
+      }
+      Serial.print("Filter repeater = ");
+      Serial.println(filterrepeater);
+       if (client.connect(server, 80)) 
+      {
+       Serial.print("connected to ");
+       Serial.println(client.remoteIP());
+    // Make a HTTP request:
+       String url; 
+       url += php;
+       url += "?nomorcones=";
+       url += filterrepeater;
+  
+       client.print("GET"); // /chiller.php?mood=najib_ganteng
+       client.print(url);
+       client.println(" HTTP/1.1");
+       client.println("Host: korlantas.id");
+       client.println("Connection: close");
+       client.println();
+       Serial.println(url);
+        }
+    }
     datacones = "";
     datanya = "";
-//    break;
-    }
-//    }
     delay(100);
-    }
      if (!client.connected()) {
     endMicros = micros();
     Serial.println();
@@ -276,3 +292,4 @@ void loop() {
     Serial.println();
   }
   }
+}
