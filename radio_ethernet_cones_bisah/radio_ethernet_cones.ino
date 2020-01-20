@@ -1,4 +1,4 @@
-/*
+//*
   Web client
  This sketch connects to a website (http://www.google.com)
  using an Arduino Wiznet Ethernet shield.
@@ -228,49 +228,6 @@ void loop() {
        Serial.println(url);
         }
     }
-    }
-    if (datanya.startsWith("R"))
-    {
-      String data1 = getValue(datanya,'~',1);
-      String data2 = getValue(datanya,'~',2);
-      String data3 = getValue(datanya,'~',3);
-      String data4 = getValue(datanya,'~',4);
-      String data5 = getValue(datanya,'~',5);
-      //start
-      if (nomcones == "1" || nomcones == "9" || nomcones == "21" || nomcones == "34" || nomcones == "52")
-      {
-        filterrepeater = data1 + "~" + data2 + "~" + data3 + "~" + data4 + "~" + data5; 
-      }
-      //finish
-      else if(nomcones == "8" || nomcones == "20" || nomcones == "33" || nomcones == "49" || nomcones == "51" || nomcones == "69")
-      {
-        filterrepeater = data1 + "~" + data2 + "~" + data3 + "~" + data4;
-      }
-      //biasa
-      else 
-      {
-        filterrepeater = data1 + "~" + data2 + "~" + data3;
-      }
-      Serial.print("Filter repeater = ");
-      Serial.println(filterrepeater);
-       if (client.connect(server, 80)) 
-      {
-       Serial.print("connected to ");
-       Serial.println(client.remoteIP());
-    // Make a HTTP request:
-       String url; 
-       url += php;
-       url += "?nomorcones=";
-       url += filterrepeater;
-  
-       client.print("GET"); // /chiller.php?mood=najib_ganteng
-       client.print(url);
-       client.println(" HTTP/1.1");
-       client.println("Host: korlantas.id");
-       client.println("Connection: close");
-       client.println();
-       Serial.println(url);
-        }
     }
     datacones = "";
     datanya = "";
