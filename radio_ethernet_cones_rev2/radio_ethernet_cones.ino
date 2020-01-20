@@ -228,7 +228,8 @@ void loop() {
        Serial.println(url);
         }
     }
-    else if (datanya.startsWith("R"))
+    }
+    if (datanya.startsWith("R"))
     {
       String data1 = getValue(datanya,'~',1);
       String data2 = getValue(datanya,'~',2);
@@ -238,17 +239,17 @@ void loop() {
       //start
       if (nomcones == "1" || nomcones == "9" || nomcones == "21" || nomcones == "34" || nomcones == "52")
       {
-        filterrepeater = data1 + data2 + data3 + data4 + data5; 
+        filterrepeater = data1 + "~" + data2 + "~" + data3 + "~" + data4 + "~" + data5; 
       }
       //finish
       else if(nomcones == "8" || nomcones == "20" || nomcones == "33" || nomcones == "49" || nomcones == "51" || nomcones == "69")
       {
-        filterrepeater = data1 + data2 + data3 + data4;
+        filterrepeater = data1 + "~" + data2 + "~" + data3 + "~" + data4;
       }
       //biasa
       else 
       {
-        filterrepeater = data1 + data2 + data3;
+        filterrepeater = data1 + "~" + data2 + "~" + data3;
       }
       Serial.print("Filter repeater = ");
       Serial.println(filterrepeater);
@@ -274,7 +275,6 @@ void loop() {
     datacones = "";
     datanya = "";
     delay(100);
-    }
      if (!client.connected()) {
     endMicros = micros();
     Serial.println();
