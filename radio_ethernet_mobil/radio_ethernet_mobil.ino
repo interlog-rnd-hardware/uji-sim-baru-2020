@@ -22,7 +22,7 @@ String getValue(String data, char separator, int index)
 
 // Enter a MAC address for your controller below.
 // Newer Ethernet shields have a MAC address printed on a sticker on the shield
-byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xEC };
+byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xEE };
 
 // if you don't want to use DNS (and reduce your sketch size)
 // use the numeric IP instead of the name for the server:
@@ -98,12 +98,12 @@ void setup() {
   Serial.println("...");
 
   // if you get a connection, report back via serial:
-  if (client.connect(server, 80)) {
-    Serial.print("connected to ");
-    Serial.println(client.remoteIP());
-    // Make a HTTP request:
-  String url; 
-  url += php;
+//  if (client.connect(server, 80)) {
+//    Serial.print("connected to ");
+//    Serial.println(client.remoteIP());
+//    // Make a HTTP request:
+//  String url; 
+//  url += php;
 //
    //motor
 //  url += "?motor=";
@@ -124,24 +124,24 @@ void setup() {
 //  url += tegangan2;
   
   //cones
-  url += "?mobil=";
-  url += nocones;
+//  url += "?mobil=";
+//  url += nocones;
 //  url += "&status=";
 //  url += statuss;
 //  url += "&tegangan=";
 //  url += tegangan;
   
-  client.print("GET"); // /chiller.php?mood=najib_ganteng
-  client.print(url);
-  client.println(" HTTP/1.1");
-  client.println("Host: korlantas.id");
-  client.println("Connection: close");
-  client.println();
-  Serial.println(url);
-  } else {
-    // if you didn't get a connection to the server:
-    Serial.println("connection failed");
-  }
+//  client.print("GET"); // /chiller.php?mood=najib_ganteng
+//  client.print(url);
+//  client.println(" HTTP/1.1");
+//  client.println("Host: korlantas.id");
+//  client.println("Connection: close");
+//  client.println();
+//  Serial.println(url);
+//  } else {
+//    // if you didn't get a connection to the server:
+//    Serial.println("connection failed");
+//  }
   beginMicros = micros();
 }
 
@@ -167,11 +167,11 @@ void loop() {
     int indexxx = datacones.indexOf('<');
     int respon = datacones.indexOf('>',indexxx+1);
     String datanya = datacones.substring(indexxx + 1, respon);
-    if (datacones.startsWith("<"))
-    {
+//    if (datacones.startsWith("<"))
+//    {
       Serial.println(datanya);
-      if (datanya.startsWith("c_1"))
-      {
+//      if (datanya.startsWith("c_1"))
+//      {
         if (client.connect(server, 80)) 
         {
           Serial.print("connected to ");
@@ -192,24 +192,24 @@ void loop() {
         }
     datacones = "";
     datanya = "";
-    }
-    delay(100);
-    }
-     if (!client.connected()) {
-    endMicros = micros();
-    Serial.println();
-    Serial.println("disconnecting.");
-    client.stop();
-    Serial.print("Received ");
-    Serial.print(byteCount);
-    Serial.print(" bytes in ");
-    float seconds = (float)(endMicros - beginMicros) / 1000000.0;
-    Serial.print(seconds, 4);
-    float rate = (float)byteCount / seconds / 1000.0;
-    Serial.print(", rate = ");
-    Serial.print(rate);
-    Serial.print(" kbytes/second");
-    Serial.println();
-  }
+//    }
+    delay(500);
+//    }
+//     if (!client.connected()) {
+//    endMicros = micros();
+//    Serial.println();
+//    Serial.println("disconnecting.");
+//    client.stop();
+//    Serial.print("Received ");
+//    Serial.print(byteCount);
+//    Serial.print(" bytes in ");
+//    float seconds = (float)(endMicros - beginMicros) / 1000000.0;
+//    Serial.print(seconds, 4);
+//    float rate = (float)byteCount / seconds / 1000.0;
+//    Serial.print(", rate = ");
+//    Serial.print(rate);
+//    Serial.print(" kbytes/second");
+//    Serial.println();
+//  }
   }
 }
