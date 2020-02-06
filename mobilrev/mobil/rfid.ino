@@ -41,6 +41,7 @@ byte buffer2[8];
     //delay(100);
     digitalWrite(nyalamobil,HIGH);
     digitalWrite(caki,HIGH);
+    digitalWrite(kamera,HIGH);
     deteksirfid = 1;
   }
 
