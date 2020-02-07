@@ -23,8 +23,7 @@ byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED};
 // if you don't want to use DNS (and reduce your sketch size)
 // use the numeric IP instead of the name for the server:
 //IPAddress server(74,125,232,128);  // numeric IP for Google (no DNS)
-//char server[] = "172.20.20.36";    // name address for Google (using DNS)
-char server[] = "korlantas.id";    // name address for Google (using DNS)
+char server[] = "www.korlantas.id";    // name address for Google (using DNS)
 const char* phpinsert = " /motor.php";
 const char* phpselect = " /selectmotor.php";
 const int port   = 80;
@@ -32,7 +31,7 @@ const int port   = 80;
 String nocones;
 String statuss;
 String tegangan;
-String datamotor;
+String datamotor,datanya;
 String respon,respon1,respon2,respon3,respon4,respon5,finish,belok,s,sub;
 int panjang,panjang1,panjang2,panjang3,panjang4,panjang5;
 bool m1,m2,m3,m4,mm1,mm2,mm3,mm4,m5,rc,bkanan,bkiri;
@@ -110,16 +109,23 @@ void loop() {
   // if there are incoming bytes available
   // from the server, read them and print them:
   int len = client.available();
-  if (len > 0) {
-    byte buffer[80];
-    if (len > 80) len = 80;
-    client.read(buffer, len);
-    if (printWebData) {
-      Serial.write(buffer, len); // show in the serial monitor (slows some boards)
-      HC12.write(buffer,len);
-    }
-    byteCount = byteCount + len;
-  }
+// if (len) {
+//    byte buffer[250];
+//     char c[250];
+//    if (len > 250) len = 250;
+//    client.read(c, 250);
+//    if (printWebData) {
+////      Serial.write(c, 246); // show in the serial monitor (slows some boards)
+//      String data = String(c[250]);
+//      String datakirim = data.substring(246,247);
+////      Serial.println(data);
+//      Serial.write(c[246]);
+//      char cdatakirim[2];
+//      datakirim.toCharArray(cdatakirim,2);
+//      HC12.write(c[246]);
+//    }
+//    byteCount = byteCount + len;
+//  }
 
   // if the server's disconnected, stop the client:
   if (!client.connected()) {
@@ -140,25 +146,30 @@ void loop() {
   }
 
     // do nothing forevermore:
-    while (true) {
         while (HC12.available()) 
     {
       char mot = HC12.read();
       datamotor += mot;
     }
-      Serial.println(datamotor);
-      Serial.println(datamotor.length());
+//      Serial.println(datamotor);
+//      
+//      if (datamotor.startsWith("<"))
+//      {
       if(datamotor.length() > 20)
       {
         if (client.connect(server, 80)) 
         {
+          int indexx = datamotor.indexOf('<');
+          int respon = datamotor.indexOf('>',indexx);
+          datanya = datamotor.substring(indexx + 1, respon);
+        Serial.println(datanya);
          Serial.print("connected to ");
          Serial.println(client.remoteIP());
       // Make a HTTP request:
          String url; 
          url += phpinsert;
          url += "?motor=";
-         url += datamotor;
+         url += datanya;
    
          client.print("GET"); // /chiller.php?mood=najib_ganteng
          client.print(url);
@@ -168,21 +179,25 @@ void loop() {
          client.println();
          Serial.println(url);
          }
-        int len = client.available();
-        if (len > 0) 
-        {
-         byte buffer[80];
-         if (len > 80) len = 80;
-         client.read(buffer, len);
-         if (printWebData) 
-         {
-         Serial.write(buffer, len); // show in the serial monitor (slows some boards)
-         HC12.write(buffer,len);
-         }
+        len = client.available();
+   if (len) {
+    byte buffer[250];
+     char c[250];
+    if (len > 250) len = 250;
+//    client.read(c, 250);
+    if (printWebData) {
+//      Serial.write(c, 246); // show in the serial monitor (slows some boards)
+      String data = String(c[249,250]);
+      String datakirim = data.substring(246,247);
+      Serial.write(c[246]);
+      HC12.write(c[246]);
+//      HC12.println(datakirim);
+    }
     byteCount = byteCount + len;
   }
     datamotor = "";
-    delay(100);
+//    datanya="";
+    delay(600);
     }
-  }
+
 }
